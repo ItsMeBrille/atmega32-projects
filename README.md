@@ -19,7 +19,3 @@ Kodeløsning på oppgaver om ATmega32
 
 - [ATmega32 datasheet](datasheet.pdf).
 - [Tegning av ATmega32](io.png).
-
-## Lisens
-
-Dette prosjektet er lisensiert under MIT-lisensen. Se [LICENSE](LICENSE) for detaljer.
