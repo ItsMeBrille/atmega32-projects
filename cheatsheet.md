@@ -1,4 +1,4 @@
-# Coding tips
+# Cheatsheet for ATmega32 programming in C
 
 ## Table of Contents
 
