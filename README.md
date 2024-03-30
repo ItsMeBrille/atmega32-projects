@@ -1,6 +1,6 @@
 # ATmega32 programmering i C
 
-Dette repositoryet inneholder eksempler på programmering av ATmega32-mikrokontrolleren i C. Du vil finne ulike emner som dekker grunnleggende operasjoner og funksjoner på mikrokontrolleren.
+Dette repoet inneholder eksempler på programmering av ATmega32 i C. Du vil finne ulike emner som dekker grunnleggende operasjoner og funksjoner på mikrokontrolleren.
 
 ## Emner
 
@@ -19,7 +19,3 @@ Kodeløsning på oppgaver om ATmega32
 
 - [ATmega32 datasheet](datasheet.pdf).
 - [Tegning av ATmega32](io.png).
-
-## Lisens
-
-Dette prosjektet er lisensiert under MIT-lisensen. Se [LICENSE](LICENSE) for detaljer.
