@@ -4,7 +4,7 @@ Dette repoet inneholder kodesnutter, eksempler og hjelpeark til programmering av
 
 ## Ressurser
 
-- [Cheatsheet for ATmega32](chearsheet.md).
+- [Cheatsheet for ATmega32](cheatsheet.md).
 - [ATmega32 datasheet](datasheet.pdf).
 - [Tegning av ATmega32](io.png).
 
