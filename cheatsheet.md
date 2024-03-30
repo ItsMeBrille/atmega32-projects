@@ -3,27 +3,42 @@
 ## Table of Contents
 
 1. [Ports](#ports)
-2. [Registers](#registry-macros)
+2. [Registers](#register-macros)
 3. [Interrupt](#interrupt)
-4. [Template](#template)
+4. [Timers/counters](#counter)
+5. [Template](#template)
 
 
 ## Ports
 
 | Port A | Alternate Function |
 |---|---|
-| PAx | ADCx (input only) |
+| PA0 - PA7 | ADC0 - ADC7 (analog input) |
 
 | Port B | Alternate Function | Port C | Alternate Function | Port D | Alternate Function |
 |---|---|---|---|---|---|
-| PB0 | T0 | PC0 | SCL | PC1 | SDA |
-| PB1 | T1 | PC2 | TCK | PC3 | TMS |
-| PB2 | AIN0 | PC4 | TDO | PC5 | TDI |
-| PB3 | AIN1 | PC6 | TOSC1 | PC7 | TOSC2 |
-| PB4 | SS | PD0 | RXD | PD1 | TXD |
-| PB5 | MOSI | PD2 | INT0 | PD3 | INT1 |
-| PB6 | MISO | PD4 | OC1B | PD5 | OC1A |
-| PB7 | SCK | PD6 | ICP1 | PD7 | OC2 |
+| `PB0` | `T0` | `PC0` | `SCL` | `PC1` | `SDA` |
+| `PB1` | `T1` | `PC2` | `TCK` | `PC3` | `TMS` |
+| `PB2` | `AIN0` | `PC4` | `TDO` | `PC5` | `TDI` |
+| `PB3` | `AIN1` | `PC6` | `TOSC1` | `PC7` | `TOSC2` |
+| `PB4` | `SS` | `PD0` | `RXD` | `PD1` | `TXD` |
+| `PB5` | `MOSI` | `PD2` | `INT0` | `PD3` | `INT1` |
+| `PB6` | `MISO` | `PD4` | `OC1B` | `PD5` | `OC1A` |
+| `PB7` | `SCK` | `PD6` | `ICP1` |` PD`7 | `OC2` |
+
+
+### I/O Ports
+
+To set the mode for the basic I/O ports, use these registers. `x` is port `A`, `B`, `C` or `D`:
+
+| DDRx | PORTx | I/O |
+|---|---|---|
+| 0 | 0 | Pull-down |
+| 0 | 1 | Pull-up |
+| 1 | 0 | Output LOW |
+| 1 | 1 | Output HIGH |
+
+To read a ports value when the port is in one of the input modes, use the `PINx` registers.
 
 
 ## Registers
@@ -39,17 +54,9 @@ These macros improve readability of bitshift operations in registers. Since they
 #define TOGGLE(reg,pin) (reg ^= (1<<pin))
 ```
 
-### Useful registers
 
-#### I/O Ports
-| DDRx | PORTx | I/O |
-|---|---|---|
-| 0 | 0 | Pull-down |
-| 0 | 1 | Pull-up |
-| 1 | 0 | Output LOW |
-| 1 | 1 | Output HIGH |
+### List of useful registers
 
-#### Other registries
 | Name | 0 | 1 | READ |
 |---|---|---|---|
 | DDRx | Input | Output |-|
@@ -59,7 +66,7 @@ These macros improve readability of bitshift operations in registers. Since they
 
 ## Interrupt
 
-Interrupt can be used on port `INT0` and `INT1`. To use the interrupts you first need to set the bit `INTx` on the `GICR` register. The `ISCx1` and `ISCx0` bits in the `MCUCR` register controls what scenarios triggers the interrupt:
+Interrupt can be used on port `INT0` and `INT1`. In order to use the interrupts you first need to set the bit `INTx` on the `GICR` register. The `ISCx1` and `ISCx0` bits in the `MCUCR` register controls what scenarios triggers the interrupt:
 
 | ISCx1 | ISCx0 | INTx state |
 |---|---|---|
@@ -95,14 +102,16 @@ ISR(INT0_vect){
 ```
 ```c
 int main(void){
-
-	// Rising edge interrupt
-    SET(PORTD, PD2); // Init trigger
+	// Activate interrupt on INT0
 	SET(GICR, INT0);
-	SET(MCUCR, ISC01); // ISCx1
-	UNSET(MCUCR, ISC00); // ISCx0
-	sei(); //Enable interrupts
-	
+	// Init trigger
+	SET(PORTD, PD2);
+	// Rising edge interrupt
+	SET(MCUCR, ISC01);
+	UNSET(MCUCR, ISC00);
+	//Enable interrupts
+	sei();
+
 	return 0;
 }
 ```
@@ -151,8 +160,8 @@ What happens when the flags is set is determined by `COMx1` and `COMx0` in the
 
 
 ### Code syntax
-
-- `OCRx = (4883);` controlls the register the counter tries to match. To find compare value from seconds use this: **(seconds * pre-scaled clock)**
+- `#define F_CPU 8000000` - sets the base clock frequenzy
+- `OCRx = (7813);` controlls the register the counter tries to match. To find compare value from seconds use this: **(seconds * pre-scaled clock)**
 
 
 ### Code example
@@ -180,7 +189,7 @@ int main(void){
 
 	// Init OC1A port
 	SET(DDRD, PD5); 
-	
+
 	return 0;
 }
 ```
