@@ -108,6 +108,84 @@ int main(void){
 ```
 
 
+## Counter
+
+There are three timers / counters:
+
+- Timer0: 8-bit timer
+- Timer1: 16-bit timer
+- Timer2: 8-bit timer
+
+The TCCRx registers controls the counter modes, where x can be `0`, `1A`, `1B` or `2`.
+
+Waveform Generation Mode:
+| WGM00 | WGM01 | Timer0 |
+|---|---|---|
+| 0 | 0 | Normal |
+| 0 | 1 | CTC (Clear timer on Compare Match) |
+| 1 | 0 | PWM, Phase correct |
+| 1 | 1 | Fast PWM |
+
+Clock Source Select:
+| CS12 | CS11 | CS10 | Prescaled clock |
+|---|---|---|---|
+| 0 | 0 | 0 | Clock stopped |
+| 0 | 0 | 1 | Clk (no prescaling) |
+| 0 | 1 | 0 | Clk / 8 |
+| 0 | 1 | 1 | Clk / 64  |
+| 1 | 0 | 0 | Clk / 256 |
+| 1 | 0 | 1 | Clk / 1024 |
+| 1 | 1 | 0 | T1 pin, falling edge |
+| 1 | 1 | 1 | T1 pin, rising edge |
+
+The `TCNTx` registers count each clock pulse. The value in the `OCRx` registers is compared with the content of the `TCNTx` registers. When they are equal, the `OCFx` flag will get set. The flags is located within the Timer Counter Interrupt Flag register `TIFR`.
+
+What happens when the flags is set is determined by `COMx1` and `COMx0` in the 
+
+| COMx1 | COMx0 | Description |
+|---|---|---|
+| 0 | 0 | Disable counter |
+| 0 | 1 | Toggle `OCx` |
+| 1 | 0 | Unset `OCx` |
+| 1 | 1 | Set `OCx` |
+
+
+### Code syntax
+
+- `OCRx = (4883);` controlls the register the counter tries to match. To find compare value from seconds use this: **(seconds * pre-scaled clock)**
+
+
+### Code example
+
+```c
+#define F_CPU 1000000 // Base clock (hz)
+```
+
+```c
+int main(void){
+	// Select the unit time CLK / 1024
+	SET(TCCR1B, CS12);
+	UNSET(TCCR1B, CS11);
+	SET(TCCR1B, CS10);
+	// Set timer into Compare Output Mode (CTC)
+	SET(TCCR1B, WGM12);
+	UNSET(TCCR1B, WGM11);
+	UNSET(TCCR1B, WGM10);
+	// Toggle OC1A on compare match
+	UNSET(TCCR1A, COM1A1);
+	SET(TCCR1A, COM1A0);
+
+	// Output Compare Register timing
+	OCR1A = 4883; // 5s * (1000000/1024)hz = 4883
+
+	// Init OC1A port
+	SET(DDRD, PD5); 
+	
+	return 0;
+}
+```
+
+
 # Template
 
 ```c
