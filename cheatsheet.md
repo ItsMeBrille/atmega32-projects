@@ -169,7 +169,6 @@ What happens when the flags is set is determined by `COMx1` and `COMx0` in the
 ```c
 #define F_CPU 1000000 // Base clock (hz)
 ```
-
 ```c
 int main(void){
 	// Select the unit time CLK / 1024
@@ -191,6 +190,44 @@ int main(void){
 	SET(DDRD, PD5); 
 
 	return 0;
+}
+```
+
+
+## Pulse width modulation (PWM)
+
+Pulse width modulation on the ATmega use the counter in fast PWM mode set by `TCCRx`to generate pulses.
+
+
+### Code syntax
+
+- `OCR0 = i;` determines the voltage generated.
+
+
+### Code example
+
+```c
+#define F_CPU 1000000 // Base clock (hz)
+```
+```c
+int main(){
+	// Waveform Generation Mode: Fast PWM
+	SET(TCCR0, WGM00);
+	SET(TCCR0, WGM01);
+
+	// Toggle at Compare match
+	SET(TCCR0, COM01);
+
+	// No prescaler
+	SET(TCCR0, CS00);
+	
+	// OC0 port as output
+	SET(DDRB, PB3);
+
+	while (1){
+		// Set PWM 'voltage' 
+		OCR0 = i;
+	}
 }
 ```
 
