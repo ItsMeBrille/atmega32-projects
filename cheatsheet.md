@@ -102,17 +102,17 @@ ISR(INT0_vect){
 ```
 ```c
 int main(void){
-	// Activate interrupt on INT0
-	SET(GICR, INT0);
-	// Init trigger
-	SET(PORTD, PD2);
-	// Rising edge interrupt
-	SET(MCUCR, ISC01);
-	UNSET(MCUCR, ISC00);
-	//Enable interrupts
-	sei();
+    // Activate interrupt on INT0
+    SET(GICR, INT0);
+    // Init trigger
+    SET(PORTD, PD2);
+    // Rising edge interrupt
+    SET(MCUCR, ISC01);
+    UNSET(MCUCR, ISC00);
+    //Enable interrupts
+    sei();
 
-	return 0;
+    return 0;
 }
 ```
 
@@ -171,25 +171,25 @@ What happens when the flags is set is determined by `COMx1` and `COMx0` in the
 ```
 ```c
 int main(void){
-	// Select the unit time CLK / 1024
-	SET(TCCR1B, CS12);
-	UNSET(TCCR1B, CS11);
-	SET(TCCR1B, CS10);
-	// Set timer into Compare Output Mode (CTC)
-	SET(TCCR1B, WGM12);
-	UNSET(TCCR1B, WGM11);
-	UNSET(TCCR1B, WGM10);
-	// Toggle OC1A on compare match
-	UNSET(TCCR1A, COM1A1);
-	SET(TCCR1A, COM1A0);
+    // Select the unit time CLK / 1024
+    SET(TCCR1B, CS12);
+    UNSET(TCCR1B, CS11);
+    SET(TCCR1B, CS10);
+    // Set timer into Compare Output Mode (CTC)
+    SET(TCCR1B, WGM12);
+    UNSET(TCCR1B, WGM11);
+    UNSET(TCCR1B, WGM10);
+    // Toggle OC1A on compare match
+    UNSET(TCCR1A, COM1A1);
+    SET(TCCR1A, COM1A0);
 
-	// Output Compare Register timing
-	OCR1A = 4883; // 5s * (1000000/1024)hz = 4883
+    // Output Compare Register timing
+    OCR1A = 4883; // 5s * (1000000/1024)hz = 4883
 
-	// Init OC1A port
-	SET(DDRD, PD5); 
+    // Init OC1A port
+    SET(DDRD, PD5); 
 
-	return 0;
+    return 0;
 }
 ```
 
@@ -211,23 +211,59 @@ Pulse width modulation on the ATmega use the counter in fast PWM mode set by `TC
 ```
 ```c
 int main(){
-	// Waveform Generation Mode: Fast PWM
-	SET(TCCR0, WGM00);
-	SET(TCCR0, WGM01);
+    // Waveform Generation Mode: Fast PWM
+    SET(TCCR0, WGM00);
+    SET(TCCR0, WGM01);
 
-	// Toggle at Compare match
-	SET(TCCR0, COM01);
+    // Toggle at Compare match
+    SET(TCCR0, COM01);
 
-	// No prescaler
-	SET(TCCR0, CS00);
-	
-	// OC0 port as output
-	SET(DDRB, PB3);
+    // No prescaler
+    SET(TCCR0, CS00);
+    
+    // OC0 port as output
+    SET(DDRB, PB3);
 
-	while (1){
-		// Set PWM 'voltage' 
-		OCR0 = i;
-	}
+    while (1){
+        // Set PWM 'voltage' 
+        OCR0 = i;
+    }
+}
+```
+
+
+## Analog inputs
+
+Port `A0 - A7` can be used as analog inputs.
+
+
+### Code Syntax
+
+- `SET(ADMUX, REFS0);` sets the reference voltage equal to the supply voltage
+
+
+# Code example
+
+```c
+int main (){
+    
+    // Init ADC channel 0
+    UNSET(DDRA,PA0); // Make ADC port as input
+    // Enable ADC with prescaler of 128
+    ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+    // Set reference voltage to AVcc (supply voltage)
+    SET(ADMUX, REFS0);
+    
+    int value;
+    
+    while (1){
+        // Read data
+        SET(ADCSRA, ADSC); // Start conversion
+        while(!(ADCSRA & (1 << ADIF))); // Wait for conversion to complete
+        value = ADCL | (ADCH << 8); // Read high and low bits
+        
+        // 'value' now contains a number between 0 and 1023
+    }
 }
 ```
 
@@ -248,6 +284,6 @@ int main(void){
     while(1){
         break;
     }
-	return 0;
+    return 0;
 }
 ```
