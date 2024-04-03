@@ -3,10 +3,12 @@
 ## Table of Contents
 
 1. [Ports](#ports)
-2. [Registers](#register-macros)
-3. [Interrupt](#interrupt)
-4. [Timers/counters](#counter)
-5. [Template](#template)
+1. [Registers](#register-macros)
+1. [Interrupt](#interrupt)
+1. [Timers/counters](#counter)
+1. [PWM](#pwm)
+1. [Analog Inputs](#analog-inputs)
+1. [Template](#template)
 
 
 ## Ports
@@ -160,7 +162,7 @@ What happens when the flags is set is determined by `COMx1` and `COMx0` in the
 
 
 ### Code syntax
-- `#define F_CPU 8000000` - sets the base clock frequenzy
+- `#define F_CPU 8000000` sets the base clock frequenzy
 - `OCRx = (7813);` controlls the register the counter tries to match. To find compare value from seconds use this: **(seconds * pre-scaled clock)**
 
 
@@ -194,9 +196,9 @@ int main(void){
 ```
 
 
-## Pulse width modulation (PWM)
+## PWM
 
-Pulse width modulation on the ATmega use the counter in fast PWM mode set by `TCCRx`to generate pulses.
+Pulse width modulation (PWM) on the ATmega use the counter in fast PWM mode set by `TCCRx`to generate pulses.
 
 
 ### Code syntax
@@ -232,15 +234,23 @@ int main(){
 ```
 
 
-## Analog inputs
+## Analog Inputs
 
-Port `A0 - A7` can be used as analog inputs.
+The ADC (Analog to Digital converter) on the ATmega can read the voltage on port `PA0 - PA7` with an accuracy of 10 bits. Since each register can only hold 8 bits, the value have to be stored in 2 registers, `ADCH` and `ADCL`. The ADC acts like a MUX, so you are **only able to meassure 1 of the 8 ports at ay one time.**
+
+| REFS1 | REFS0 | Vref to ADC |
+|---|---|---|
+| 0 | 0 | AREF pin |
+| 0 | 1 | AVCC pin i.e. Vcc 5 V |
+| 1 | 0 | Reserved |
+| 1 | 1 | Internal 2 |
 
 
 ### Code Syntax
 
 - `SET(ADMUX, REFS0);` sets the reference voltage equal to the supply voltage
-
+- `while(!(ADCSRA & (1 << ADIF)));` waits for conversion to complete
+- `value = ADCL | (ADCH << 8);` reads the value by reading combining high and low bits
 
 # Code example
 
