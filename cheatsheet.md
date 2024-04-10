@@ -42,6 +42,24 @@ To set the mode for the basic I/O ports, use these registers. `x` is port `A`, `
 
 To read a ports value when the port is in one of the input modes, use the `PINx` registers.
 
+### Code example
+
+Function to read a button at 
+```c
+uint8_t debounce(char pinName, uint8_t pinNumber)
+{
+	if (bit_is_clear(pinName, pinNumber)) // If the button is being pressed
+	{
+		_delay_ms(5);						  // wait 5 ms
+		if (bit_is_clear(pinName, pinNumber)) // If the button is still being pressed
+		{
+			return (1); // return yes the button was pressed
+		}
+	}
+	return (0);
+}
+```
+
 
 ## Registers
 
@@ -227,7 +245,7 @@ int main(){
     SET(DDRB, PB3);
 
     while (1){
-        // Set PWM 'voltage' 
+        // Set PWM 'voltage' 0 - 255
         OCR0 = i;
     }
 }
@@ -251,16 +269,21 @@ The ADC (Analog to Digital converter) on the ATmega can read the voltage on port
 - `SET(ADMUX, REFS0);` sets the reference voltage equal to the supply voltage
 - `while(!(ADCSRA & (1 << ADIF)));` waits for conversion to complete
 - `value = ADCL | (ADCH << 8);` reads the value by reading combining high and low bits
+- `#define MAP(x, a, b, c, d) ((x - a) * (d - c) / (b - a) + c)` can be used as macro for mapping values between ranges. Use like this, `MAP(value, low_in, hi_in, low_out, hi_out)`
 
 # Code example
 
 ```c
 int main (){
     
-    // Init ADC channel 0
-    UNSET(DDRA,PA0); // Make ADC port as input
-    // Enable ADC with prescaler of 128
-    ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+    // Enable ADC (Analog to Digital Converter) module
+    SET(ADCSRA, ADEN); // Set the ADEN (ADC Enable) bit in the ADCSRA register
+
+    // Configure ADC prescaler for ADC clock frequency
+    SET(ADCSRA, ADPS2);
+    SET(ADCSRA, ADPS1);
+    SET(ADCSRA, ADPS0);
+
     // Set reference voltage to AVcc (supply voltage)
     SET(ADMUX, REFS0);
     
