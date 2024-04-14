@@ -180,6 +180,7 @@ What happens when the flags is set is determined by `COMx1` and `COMx0` in the
 
 
 ### Code syntax
+
 - `#define F_CPU 8000000` sets the base clock frequenzy
 - `OCRx = (7813);` controlls the register the counter tries to match. To find compare value from seconds use this: **(seconds * pre-scaled clock)**
 
@@ -262,6 +263,8 @@ The ADC (Analog to Digital converter) on the ATmega can read the voltage on port
 | 0 | 1 | AVCC pin i.e. Vcc 5 V |
 | 1 | 0 | Reserved |
 | 1 | 1 | Internal 2 |
+
+To use interrupt on Analog inputs you can use the `ADC_vect` flag. To use this you must set the `ADIE` in the `ADCSRA` register.
 
 
 ### Code Syntax
