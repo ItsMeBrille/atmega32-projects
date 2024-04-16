@@ -255,7 +255,7 @@ int main(){
 
 ## Analog Inputs
 
-The ADC (Analog to Digital converter) on the ATmega can read the voltage on port `PA0 - PA7` with an accuracy of 10 bits. Since each register can only hold 8 bits, the value have to be stored in 2 registers, `ADCH` and `ADCL`. The ADC acts like a MUX, so you are **only able to meassure 1 of the 8 ports at ay one time.**
+The ADC (Analog to Digital converter) on the ATmega can read the voltage on port `PA0 - PA7` with an accuracy of 10 bits. Since each register can only hold 8 bits, the value have to be stored in 2 registers, `ADCH` and `ADCL`. The ADC acts like a MUX, so you are **only able to meassure 1 of the 8 ports at any one time.**
 
 | REFS1 | REFS0 | Vref to ADC |
 |---|---|---|
