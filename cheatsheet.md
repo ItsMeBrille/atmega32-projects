@@ -26,7 +26,7 @@
 | `PB4` | `SS` | `PD0` | `RXD` | `PD1` | `TXD` |
 | `PB5` | `MOSI` | `PD2` | `INT0` | `PD3` | `INT1` |
 | `PB6` | `MISO` | `PD4` | `OC1B` | `PD5` | `OC1A` |
-| `PB7` | `SCK` | `PD6` | `ICP1` |` PD`7 | `OC2` |
+| `PB7` | `SCK` | `PD6` | `ICP1` | `PD7` | `OC2` |
 
 
 ### I/O Ports
