@@ -5,6 +5,10 @@
 
 #define ENCODER_STEPS 3 // Value increment pr rotary step
 
+
+// *(port - hex) is because the PIN, PORT and DDR register is located with relative
+// distance to each other in memory. Therefore we need _port and we can calc the rest.
+
 struct Rotary{
 	volatile uint8_t *clk_port;
 	uint8_t clk_num;
@@ -16,39 +20,42 @@ struct Rotary{
 };
 
 
+
 void initRotary(struct Rotary *rot){
 	// Use as inputs
-	UNSET(*(rot->clk_port - 0x01), rot->clk_num);
+	UNSET(*(rot->clk_port - 0x01), rot->clk_num); // PORT-0x01 = DDR
 	UNSET(*(rot->dt_port - 0x01), rot->dt_num);
 	UNSET(*(rot->sw_port - 0x01), rot->sw_num);
 	// Use pull-up
-	SET(*rot->clk_port, rot->clk_num);
+	SET(*rot->clk_port, rot->clk_num); // PORT
 	SET(*rot->dt_port, rot->dt_num);
 	SET(*rot->sw_port, rot->sw_num);
-	
 	// Reset value
-	rot->value = 64;
+	rot->value = 50;
+	_delay_ms(1); // To ensure its finished before startup continues
 }
 
 
-void updateRotary(struct Rotary *rot){
+_Bool updateRotary(struct Rotary *rot){
 	// Check if encoder is rotating
-	if(!READ(*(rot->clk_port-0x02), rot->clk_num)){// *(pin -0x02) is because the PIN register is located with relative distance to the PORT register.
+	if(!READ(*(rot->clk_port-0x02), rot->clk_num)){ // PORT-0x02 = PIN
 		// Check direction of rotation
 		if(!READ(*(rot->dt_port-0x02), rot->dt_num)){
 			// Counter clockwise
 			if(rot->value-ENCODER_STEPS < 0){rot->value=0;} // Upper limit
-			else {rot->value-=ENCODER_STEPS;} // Increment
-			
-			} else {
+			else {rot->value-=ENCODER_STEPS;} // Decrement
+		} else {
 			// Clockwise
 			if(rot->value+ENCODER_STEPS > 127){rot->value=127;} // Upper limit
 			else {rot->value+=ENCODER_STEPS;} // Increment
 		}
 		while(!READ(*(rot->clk_port-0x02), rot->clk_num)){} // Wait until rotation is complete before continuing
+		return 1; // Changed
 	}
 	// Click rotary to reset to middle
 	else if(!READ(*(rot->sw_port-0x02), rot->sw_num)){
-		rot->value=64;
+		rot->value = 50;
+		return 1; // Changed
 	}
+	return 0;
 }
