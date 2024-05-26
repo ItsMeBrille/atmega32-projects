@@ -5,7 +5,7 @@
 #define S1 PC1
 #define S2 PC0
 	
-void analog_init(){
+void initAnalog(){
 	// Enable ADC (Analog to Digital Converter) module
 	SET(ADCSRA, ADEN); // Set the ADEN (ADC Enable) bit in the ADCSRA register
 	// Configure ADC prescaler for ADC clock frequency
@@ -17,7 +17,7 @@ void analog_init(){
 }
 
 
-int analogRead(){
+int readAnalog(){
 	// Read data
 	SET(ADCSRA, ADSC); // Start conversion
 	while(!(ADCSRA & (1 << ADIF))); // Wait for conversion to complete
@@ -25,7 +25,7 @@ int analogRead(){
 }
 
 
-void fader_init(){
+void initFader(){
 	analog_init();
 	SET(DDRC, S0);
 	SET(DDRC, S1);
@@ -33,7 +33,7 @@ void fader_init(){
 }
 
 
-int faderRead(int mux){	
+int readFader(int mux){	
 	// Multiplexer
 	if (mux & 1){SET(PORTC, S0);} // S0
 	else {UNSET(PORTC, S0);}

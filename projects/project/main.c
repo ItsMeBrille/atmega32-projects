@@ -48,7 +48,7 @@ void updateChannels(){
 	}
 	
 	// Update volume from fader (if mux worked this would be a loop)
-	int check = faderRead(active.muxAddr);
+	int check = readFader(active.muxAddr);
 	if (active.vol_val < check-1 || active.vol_val > check+1){
 		active.vol_val = check;
 		sendData(active.channel_num, 3, active.vol_val);
@@ -57,7 +57,7 @@ void updateChannels(){
 }
 
 // Initialize Timer2 for generating interrupt every 1 second
-void counter_init(){
+void initCounter(){
 	// Use no prescaler CLK / 1
 	SET(TCCR2, CS21);
 	
@@ -76,7 +76,7 @@ int main(){
 	active = ch1; // Set default channel
 	
 	// Init analog and mux
-	fader_init();
+	initFader();
 
 	// Init rotary encoders
  	initRotary(&LO);
@@ -91,7 +91,7 @@ int main(){
 
 	USART_init(); // Start USART
 	
-	counter_init(); // Start counter
+	initCounter(); // Start counter
 	sei();	// Enable interrupt
 	
 	while(1){}
