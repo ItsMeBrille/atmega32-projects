@@ -4,6 +4,7 @@
 #define READ(reg,pin) ((0x00 == ((reg & (1<<pin))>> pin))?0x00:0x01)
 
 #define ENCODER_STEPS 3 // Value increment pr rotary step
+#define MAX_ENCODER_VALUE 100 // Upper limit for encoder value
 
 
 // *(port - hex) is because the PIN, PORT and DDR register is located with relative
@@ -31,7 +32,7 @@ void initRotary(struct Rotary *rot){
 	SET(*rot->dt_port, rot->dt_num);
 	SET(*rot->sw_port, rot->sw_num);
 	// Reset value
-	rot->value = 50;
+	rot->value = MAX_ENCODER_VALUE / 2;
 	_delay_ms(1); // To ensure its finished before startup continues
 }
 
@@ -54,7 +55,7 @@ _Bool updateRotary(struct Rotary *rot){
 	}
 	// Click rotary to reset to middle
 	else if(!READ(*(rot->sw_port-0x02), rot->sw_num)){
-		rot->value = 50;
+		rot->value = MAX_ENCODER_VALUE / 2;
 		return 1; // Changed
 	}
 	return 0;
