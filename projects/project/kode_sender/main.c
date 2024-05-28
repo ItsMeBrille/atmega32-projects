@@ -1,6 +1,5 @@
 #define F_CPU 1000000UL
 #include "avr/io.h"
-#include <util/delay.h>
 #include <avr/interrupt.h>
 #include "channels.h" // Custom library for handling each channel
 #include "rotaries.h" // Custom library for rotary encoders
@@ -10,7 +9,6 @@
 // DDR for direction, PORT for setting value, PIN for reading value.
 #define SET(reg,pin) reg |= (1 << pin)
 #define UNSET(reg,pin) reg &= ~(1 << pin)
-#define READ(reg,pin) ((0x00 == ((reg & (1<<pin))>> pin))?0x00:0x01)
 
 // Port and GPIO pin for select button, A0 mux address
 struct Channel ch1 = {0, &PORTD, 5, 0};
@@ -70,8 +68,7 @@ ISR(TIMER2_OVF_vect){
 	updateChannels();
 }
 
-
-
+// Main function
 int main(){
 	active = ch1; // Set default channel
 	
